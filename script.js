@@ -1,9 +1,9 @@
 // Araç Parça Yönetim Sistemi JavaScript Kodu
 
 // Global değişkenler
-let vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
-let currentVehicleId = null;
-let qrScanner = null;
+vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
+currentVehicleId = null;
+qrScanner = null;
 
 // Örnek araçlar ekle
 function addSampleVehicles() {
@@ -1412,4 +1412,5 @@ function setupEventListeners() {
     window.addEventListener('beforeunload', function() {
         saveVehicles();
     });
+
 }
