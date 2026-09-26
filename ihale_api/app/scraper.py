@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from urllib.parse import urljoin
 
 import requests
@@ -11,6 +12,14 @@ from app.models import TenderItem
 
 
 ANNOUNCEMENT_RE = re.compile(r"Ilan Numarasi|İlan Numarası", re.IGNORECASE)
+
+
+def normalize_for_match(value: str) -> str:
+    value = value.casefold()
+    stripped = "".join(
+        char for char in unicodedata.normalize("NFKD", value) if not unicodedata.combining(char)
+    )
+    return stripped
 
 
 class IhaleClient:
@@ -115,14 +124,16 @@ class IhaleClient:
                 announcement_number = first_line.strip()
 
             for entry in block[1:]:
-                low = entry.lower()
-                if "son başvuru" in low or "son basvuru" in low:
+                normalized_entry = normalize_for_match(entry)
+                if "son basvuru" in normalized_entry:
                     deadline = entry
                     continue
-                if "iptal" in low:
+                if "iptal" in normalized_entry:
                     status = entry
                     continue
-                if unit is None and ("/" in entry or "başkanlığ" in low or "baskanlig" in low):
+                if unit is None and (
+                    "/" in entry or "baskanlig" in normalized_entry or "sube mudurlugu" in normalized_entry
+                ):
                     unit = entry
                     continue
                 if title is None:
